@@ -32,7 +32,7 @@ object Numerics {
     def evens: Stream[Long] = longS(2, 2)
     def odds:  Stream[Long] = longS(3, 2)
 
-    def sieve(count: Int): Long = {
+    def nthPrime(count: Int): Long = {
         @tailrec def _filt(seen: Stream[Long], iters: Int): Long = {
             val n = seen.head
             val rest = seen.tail.filter(i => i % n != 0)
@@ -44,6 +44,25 @@ object Numerics {
             case 1 => 1
             case 2 => 2
             case _ => _filt(odds, 2)
+        }
+    }
+
+    def primesUpto(limit: Long): Stream[Long] = {
+        @tailrec def _filt(seen: Stream[Long], accum: Stream[Long]): Stream[Long] = {
+            val n = seen.head
+            val rest = seen.tail.filter(i => i % n != 0)
+            if (n >= limit) accum else _filt(rest, cons(n, rest))
+        }
+
+        cons(1, cons(2, _filt(odds.takeWhile(_ < limit), Stream[Long]())))
+    }
+}
+
+object Comb {
+    def pairs[A](input: Seq[A]): Seq[(A, A)] = {
+        input match {
+            case Nil => Nil
+            case _ => input.tail.map(e => (input.head, e)) ++ pairs(input.tail)
         }
     }
 }
